@@ -1,15 +1,15 @@
 #include <Arduino.h>
 #include <TimerOne.h>
 
-// #define USE_PWM
-
 #define IR_LED 9
 #define RED_LED 13
 
 // Pulse times (microseconds)
-#define ZERO_PULSE 300
-#define ONE_PULSE 1160
-#define ON_PULSE 580
+#define ZERO_PULSE 440
+#define ONE_PULSE 1300
+#define ON_PULSE 440
+#define BLOCK_START_PULSE 3500
+#define BLOCK_START_OFF 1740
 
 // Day of week
 #define DOW_SUN 1
@@ -96,21 +96,17 @@ struct block3 {
 };
 
 unsigned int rate; // us interval of PWM
-unsigned int duty = 512; // 1023 = 100%
+unsigned int duty = 379; // 1023 = 100%
 
 void setup() {
 	pinMode(IR_LED, OUTPUT);
 	pinMode(RED_LED, OUTPUT);
 	digitalWrite(IR_LED, LOW);
 	digitalWrite(RED_LED, LOW);
-#ifdef USE_PWM
-	rate = khz_to_us(38);
+	rate = 27;
 	Timer1.initialize(rate);
-#endif
 
 	Serial.begin(115200);
-
-	digitalWrite(RED_LED, HIGH);
 }
 
 void loop() {
@@ -142,22 +138,21 @@ void send_message(struct block1 *b1, struct block2 *b2, struct block3 *b3)
 	for (int i=0; i<5; i++)
 		send(0);
 	on_pulse();
-	delay(26);
+	delay(25);
 
-	send(1);
 	send_block((byte*)b1, sizeof(struct block1));
 	delay(34);
 
-	send(1);
 	send_block((byte*)b2, sizeof(struct block2));
 	delay(34);
 
-	send(1);
 	send_block((byte*)b3, sizeof(struct block3));
 }
 
 void send_block(byte *b, unsigned int s)
 {
+	start_pulse();
+	delayMicroseconds(BLOCK_START_OFF);
 	for (int i=0; i<s; i++) {
 		for (int j=0; j<8; j++) {
 			send(*b & (1 << j));
@@ -175,16 +170,16 @@ void send(boolean b) {
 		delayMicroseconds(ONE_PULSE);
 }
 
+void start_pulse() {
+	PWM_ON;
+	delayMicroseconds(BLOCK_START_PULSE);
+	PWM_OFF;
+}
+
 void on_pulse() {
-#ifdef USE_PWM
 	PWM_ON;
 	delayMicroseconds(ON_PULSE);
 	PWM_OFF;
-#else
-	digitalWrite(IR_LED, HIGH);
-	delayMicroseconds(ON_PULSE);
-	digitalWrite(IR_LED, LOW);
-#endif
 }
 
 void send_byte(byte b) {
