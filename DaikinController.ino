@@ -1,4 +1,3 @@
-#include <Arduino.h>
 #include <TimerOne.h>
 #include "DaikinController.h"
 
@@ -18,23 +17,23 @@ const byte b1header[6] = {0x11, 0xDA, 0x27, 0, 0xC5, 0};
 const byte b2header[5] = {0x11, 0xDA, 0x27, 0, 0x42};
 const byte b3header[5] = {0x11, 0xDA, 0x27, 0, 0};
 
-struct block1 {
+typedef struct Block1 {
 	byte header[6];
 	byte pad1:4; // 0
 	byte comfort:1;
 	byte pad2:3; // 0
 	byte checksum;
-};
+} Block1;
 
-struct block2 {
+typedef struct Block2 {
 	byte header[5];
 	byte time:11;
 	byte day:3;
 	byte pad:2;
 	byte checksum;
-};
+} Block2;
 
-struct block3 {
+typedef struct Block3 {
 	byte header[5];
 	byte power:1;
 	byte pad:3;  // 0x6
@@ -42,7 +41,7 @@ struct block3 {
 	byte pad2:2; // 0
 	byte temp:7;
 	byte pad3;   // 0
-	byte vert_defelector:4;
+	byte vert_deflector:4;
 	byte fan:4;
 	byte horiz_deflector:4;
 	byte pad4:4; // 0
@@ -62,7 +61,7 @@ struct block3 {
 	byte timer:1;
 	byte pad12; // 0
 	byte checksum;
-};
+} Block3;
 
 void setup() {
 	pinMode(IR_LED, OUTPUT);
@@ -80,22 +79,7 @@ void loop() {
 	digitalWrite(RED_LED, LOW);
 }
 
-void send_new_state(ACstate &s)
-{
-	block1 b1;
-	block2 b2;
-	block3 b3;
-
-	init_b1(&b1);
-	init_b2(&b2);
-	init_b3(&b3);
-
-	state_to_blocks(s, &b1, &b2, &b3);
-
-	send_message(&b1, &b2, &b3);
-}
-
-void state_to_blocks(ACstate *s, block1 *b1, block2 *b2, block3 *b3)
+void state_to_blocks(ACstate *s, Block1 *b1, Block2 *b2, Block3 *b3)
 {
 	b1->comfort = s->comfort;
 	b2->time = s->time;
@@ -103,8 +87,8 @@ void state_to_blocks(ACstate *s, block1 *b1, block2 *b2, block3 *b3)
 	b3->power = s->power;
 	b3->mode = s->mode;
 	b3->temp = s->temp;
-	b3->vert_defelector = s->vert_defelector;
-	b3->fan = s->fan
+	b3->vert_deflector = s->vert_deflector;
+	b3->fan = s->fan;
 	b3->horiz_deflector = s->horiz_deflector;
 	b3->powerful = s->powerful;
 	b3->quiet = s->quiet;
@@ -113,11 +97,11 @@ void state_to_blocks(ACstate *s, block1 *b1, block2 *b2, block3 *b3)
 	b3->timer = s->timer;
 }
 
-void send_message(struct block1 *b1, struct block2 *b2, struct block3 *b3)
+void send_message(Block1 *b1, Block2 *b2, Block3 *b3)
 {
-	calc_checksum((byte*)b1, sizeof(struct block1));
-	calc_checksum((byte*)b2, sizeof(struct block2));
-	calc_checksum((byte*)b3, sizeof(struct block3));
+	calc_checksum((byte*)b1, sizeof(Block1));
+	calc_checksum((byte*)b2, sizeof(Block2));
+	calc_checksum((byte*)b3, sizeof(Block3));
 
 	// Message opens with 5 leading 0s then a 26ms gap
 	for (int i=0; i<5; i++)
@@ -125,13 +109,45 @@ void send_message(struct block1 *b1, struct block2 *b2, struct block3 *b3)
 	on_pulse();
 	delay(25);
 
-	send_block((byte*)b1, sizeof(struct block1));
+	send_block((byte*)b1, sizeof(Block1));
 	delay(34);
 
-	send_block((byte*)b2, sizeof(struct block2));
+	send_block((byte*)b2, sizeof(Block2));
 	delay(34);
 
-	send_block((byte*)b3, sizeof(struct block3));
+	send_block((byte*)b3, sizeof(Block3));
+}
+
+void init_b1(Block1 *b1) {
+	memset(b1, 0, sizeof(Block1));
+	memcpy(b1->header, b1header, sizeof(b1->header));
+}
+
+void init_b2(Block2 *b2) {
+	memset(b2, 0, sizeof(Block2));
+	memcpy(b2->header, b2header, sizeof(b2->header));
+}
+
+void init_b3(Block3 *b3) {
+	memset(b3, 0, sizeof(Block3));
+	memcpy(b3->header, b3header, sizeof(b3->header));
+	b3->pad = 0x6;
+}
+
+void send_new_state(ACstate *s)
+{
+	Block0 b0;
+	Block1 b1;
+	Block2 b2;
+	Block3 b3;
+
+	init_b1(&b1);
+	init_b2(&b2);
+	init_b3(&b3);
+
+	state_to_blocks(s, &b1, &b2, &b3);
+
+	send_message(&b1, &b2, &b3);
 }
 
 void send_block(byte *b, unsigned int s)
@@ -172,23 +188,7 @@ void send_byte(byte b) {
 		send(b & (1<<i));
 }
 
-void init_b1(struct block1 *b1) {
-	memset(b1, 0, sizeof(struct block1));
-	memcpy(b1->header, b1header, sizeof(b1->header));
-}
-
-void init_b2(struct block2 *b2) {
-	memset(b2, 0, sizeof(block2));
-	memcpy(b2->header, b2header, sizeof(b2->header));
-}
-
-void init_b3(struct block3 *b3) {
-	memset(b3, 0, sizeof(struct block3));
-	memcpy(b3->header, b3header, sizeof(b3->header));
-	b3->pad = 0x6;
-}
-
-void test_message(struct block1 *b1, struct block2 *b2, struct block3 *b3)
+void test_message(Block1 *b1, Block2 *b2, Block3 *b3)
 {
 	b2->time=make_time(7, 0);
 	b2->day=DOW_SUN;
@@ -196,7 +196,7 @@ void test_message(struct block1 *b1, struct block2 *b2, struct block3 *b3)
 	b3->power=1;
 	b3->mode = MODE_AUTO;
 	b3->temp = 23;
-	b3->vert_defelector = DEFLECTOR_ON;
+	b3->vert_deflector = DEFLECTOR_ON;
 	b3->horiz_deflector = DEFLECTOR_ON;
 	b3->fan = FAN_AUTO;
 	b3->turn_off_time = NO_TIME;

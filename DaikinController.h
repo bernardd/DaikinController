@@ -1,6 +1,8 @@
 #ifndef _DAIKINCONTROLLER_H_
 #define _DAIKINCONTROLLER_H_
 
+#include <Arduino.h>
+
 #define IR_LED 9
 #define RED_LED 13
 
@@ -67,16 +69,16 @@
 
 #define NO_TIME 0x600
 
-struct ACstate {
+typedef struct ACstate {
 	byte comfort:1;
 	unsigned int time:11;
 	byte day:3;
 	byte power:1;
 	byte mode:3;
 	byte temp:7;
-	byte vert_deflect:4;
+	byte vert_deflector:4;
 	byte fan:4;
-	byte hoix_deflect:4;
+	byte horiz_deflector:4;
 	unsigned int turn_on_time:11;
 	unsigned int turn_off_time:11;
 	byte powerful:1;
@@ -84,7 +86,7 @@ struct ACstate {
 	byte motion_detect:1;
 	byte eco:1;
 	byte timer:1; // 61 bits
-};
+} ACstate;
 
 void send_new_state(ACstate *s);
 

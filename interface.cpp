@@ -1,4 +1,5 @@
-#include "DakinController.h"
+#include <Serial.h>
+#include "DaikinController.h"
 
 #define STATE_START 0
 #define STATE_READ 1
@@ -13,7 +14,7 @@ void serialEvent()
 {
 	while (Serial.available()) {
 		char c = Serial.read();
-		switch state {
+		switch (state) {
 			case STATE_START:
 				if (c == 'S')
 					send_state();
@@ -26,6 +27,7 @@ void serialEvent()
 				if (readAt == sizeof(ACstate)) {
 					acState = newState;
 					send_new_state(&acState);
+					readAt = 0;
 				}
 				break;
 		}
