@@ -1,9 +1,9 @@
-#include "DaikinController.h"
+#include "DakinController.h"
 
 #define STATE_START 0
 #define STATE_READ 1
 
-byte state = 
+byte state = STATE_START;
 byte readAt = 0;
 
 ACstate acState = {};
@@ -23,9 +23,11 @@ void serialEvent()
 				break;
 			case STATE_READ:
 				*((char*)(&newState) + readAt++) = c;
-				if (readAt == sizeof(ACstate))
-
-					break;
+				if (readAt == sizeof(ACstate)) {
+					acState = newState;
+					send_new_state(&acState);
+				}
+				break;
 		}
 	}
 }
