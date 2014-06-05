@@ -1,8 +1,6 @@
 #include <Arduino.h>
 #include <TimerOne.h>
-
-#define IR_LED 9
-#define RED_LED 13
+#include "DaikinController.h"
 
 // Pulse times (microseconds)
 #define ZERO_PULSE 440
@@ -11,38 +9,9 @@
 #define BLOCK_START_PULSE 3500
 #define BLOCK_START_OFF 1740
 
-// Day of week
-#define DOW_SUN 1
-#define DOW_MON 2
-#define DOW_TUE 3
-#define DOW_WED 4
-#define DOW_THU 5
-#define DOW_FRI 6
-#define DOW_SAT 7
-
-// Modes
-#define MODE_AUTO 0
-#define MODE_DRY  2
-#define MODE_COOL 3
-#define MODE_HEAT 4
-#define MODE_FAN  6
-
-// Deflectors
-#define DEFLECTOR_OFF 0
-#define DEFLECTOR_ON 0xF
-
-// Fan
-#define FAN_AUTO  0xA
-#define FAN_QUIET 0xB
-#define FAN_1     0x3
-#define FAN_2     0x4
-#define FAN_3     0x5
-#define FAN_4     0x6
-#define FAN_5     0x7
-
-#define NO_TIME = 0x600
-
-#define PWM_ON Timer1.pwm(IR_LED, duty, rate)
+#define PWM_RATE 27 // us interval
+#define PWM_DUTY 379 // ~37% (100% = 1023)
+#define PWM_ON Timer1.pwm(IR_LED, PWM_DUTY, PWM_RATE)
 #define PWM_OFF Timer1.disablePwm(9);
 
 const byte b1header[6] = {0x11, 0xDA, 0x27, 0, 0xC5, 0};
@@ -95,23 +64,24 @@ struct block3 {
 	byte checksum;
 };
 
-unsigned int rate; // us interval of PWM
-unsigned int duty = 379; // 1023 = 100%
-
 void setup() {
 	pinMode(IR_LED, OUTPUT);
 	pinMode(RED_LED, OUTPUT);
 	digitalWrite(IR_LED, LOW);
 	digitalWrite(RED_LED, LOW);
-	rate = 27;
-	Timer1.initialize(rate);
+	Timer1.initialize(PWM_RATE);
 
-	Serial.begin(115200);
+	Serial.begin(9600);
 }
 
 void loop() {
 	digitalWrite(RED_LED, HIGH);
 
+	digitalWrite(RED_LED, LOW);
+}
+
+void send_new_state(ACstate &s)
+{
 	block1 b1;
 	block2 b2;
 	block3 b3;
@@ -120,12 +90,27 @@ void loop() {
 	init_b2(&b2);
 	init_b3(&b3);
 
-	test_message(&b1, &b2, &b3);
+	state_to_blocks(s, &b1, &b2, &b3);
+
 	send_message(&b1, &b2, &b3);
+}
 
-	digitalWrite(RED_LED, LOW);
-
-	delay(2500);
+void state_to_blocks(ACstate *s, block1 *b1, block2 *b2, block3 *b3)
+{
+	b1->comfort = s->comfort;
+	b2->time = s->time;
+	b2->day = s->day;
+	b3->power = s->power;
+	b3->mode = s->mode;
+	b3->temp = s->temp;
+	b3->vert_defelector = s->vert_defelector;
+	b3->fan = s->fan
+	b3->horiz_deflector = s->horiz_deflector;
+	b3->powerful = s->powerful;
+	b3->quiet = s->quiet;
+	b3->motion_detect = s->motion_detect;
+	b3->eco = s->eco;
+	b3->timer = s->timer;
 }
 
 void send_message(struct block1 *b1, struct block2 *b2, struct block3 *b3)
@@ -214,8 +199,8 @@ void test_message(struct block1 *b1, struct block2 *b2, struct block3 *b3)
 	b3->vert_defelector = DEFLECTOR_ON;
 	b3->horiz_deflector = DEFLECTOR_ON;
 	b3->fan = FAN_AUTO;
-//	b3->turn_off_time = NO_TIME;
-//	b3->turn_on_time = NO_TIME;
+	b3->turn_off_time = NO_TIME;
+	b3->turn_on_time = NO_TIME;
 }
 
 // Simple 8-bit modular-sum checksum
@@ -233,7 +218,3 @@ unsigned int make_time(unsigned int hours, unsigned int mins)
 	return (hours*60) + mins;
 }
 
-unsigned int khz_to_us(unsigned int khz)
-{
-	return 1000/khz;
-}

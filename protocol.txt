@@ -1,0 +1,10 @@
+Server -> Client:
+'S' - Send state
+'C[State]' - Change state
+
+Client -> Server
+'S[State]' - Current state
+
+
+
+
