@@ -9,10 +9,22 @@ void setup() {
 	Timer1.initialize(PWM_RATE);
 
 	Serial.begin(9600);
+	send_state();
 }
 
-void loop() {
-	digitalWrite(RED_LED, HIGH);
+#define KA_INTERVAL 2000
+unsigned int lastKA = 0;
 
-	digitalWrite(RED_LED, LOW);
+void loop() {
+	unsigned int now = millis();
+	if ((now - lastKA) >= KA_INTERVAL) {
+		digitalWrite(RED_LED, HIGH);
+		Serial.write('K');
+		lastKA = now;
+		digitalWrite(RED_LED, LOW);
+	}
+}
+
+void serialEvent() {
+	handle_input();
 }

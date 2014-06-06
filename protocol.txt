@@ -4,8 +4,8 @@ Server -> Client:
 
 Client -> Server
 'S[State]' - Current state
-RRR - Reset stream (close and let the XBee reopen it)
-
+K - Keepalive
+D....\n - Debug info
 
 State:
 
@@ -16,7 +16,8 @@ power:1
 mode:3
 temp:7
 vert_deflect:4
-hoix_deflect:4
+fan:4
+hoiz_deflect:4
 turn_on_time:11
 turn_off_time:11
 powerful:1

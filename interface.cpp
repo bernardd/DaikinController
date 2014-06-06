@@ -13,10 +13,13 @@ ACstate newState = {};
 void send_state()
 {
 	// TODO send state to server
+	Serial.write('S');
+	Serial.write((unsigned char*)&acState, sizeof(acState));
 }
 
-void serialEvent()
+void handle_input()
 {
+	Serial.write("Dhandle_input called\n");
 	while (Serial.available()) {
 		char c = Serial.read();
 		switch (state) {

@@ -95,5 +95,7 @@ typedef struct ACstate {
 } ACstate;
 
 void send_new_state(ACstate *s);
+void send_state();
+void handle_input();
 
 #endif // _DAIKINCONTROLLER_H_
