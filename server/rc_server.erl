@@ -34,7 +34,7 @@ stop() ->
 	exit(whereis(?MODULE), kill).
 
 init(Port) ->
-	{ok, Socket} = gen_tcp:listen(Port, [binary, {active, false}, {reuseaddr, true}]),
+	{ok, Socket} = gen_tcp:listen(Port, [binary, {active, false}, {reuseaddr, true}, {nodelay, true}]),
 	io:fwrite("Listening on socket.~n", []),
 	listen(Socket).
 
