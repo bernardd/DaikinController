@@ -1,5 +1,8 @@
 #include "DaikinController.h"
 #include <TimerOne.h>
+#include <SoftwareSerial.h>
+
+SoftwareSerial xbSerial(2, 3);
 
 void setup() {
 	pinMode(IR_LED, OUTPUT);
@@ -9,6 +12,7 @@ void setup() {
 	Timer1.initialize(PWM_RATE);
 
 	Serial.begin(9600);
+	xbSerial.begin(9600);
 	send_state();
 }
 
@@ -18,13 +22,10 @@ unsigned int lastKA = 0;
 void loop() {
 	unsigned int now = millis();
 	if ((now - lastKA) >= KA_INTERVAL) {
-		digitalWrite(RED_LED, HIGH);
-		Serial.write('K');
+		xbSerial.write('K');
 		lastKA = now;
-		digitalWrite(RED_LED, LOW);
 	}
+	if (xbSerial.available())
+		handle_input();
 }
 
-void serialEvent() {
-	handle_input();
-}

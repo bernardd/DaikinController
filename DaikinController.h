@@ -91,7 +91,7 @@ typedef struct ACstate {
 	byte quiet:1;
 	byte motion_detect:1;
 	byte eco:1;
-	byte timer:1; // 61 bits
+	byte timer:1; // 65 bits
 } ACstate;
 
 void send_new_state(ACstate *s);

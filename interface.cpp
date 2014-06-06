@@ -1,4 +1,4 @@
-#include <Serial.h>
+#include <SoftwareSerial.h>
 #include "DaikinController.h"
 
 #define STATE_START 0
@@ -10,22 +10,24 @@ byte readAt = 0;
 ACstate acState = {};
 ACstate newState = {};
 
+extern SoftwareSerial xbSerial;
+
 void send_state()
 {
 	// TODO send state to server
-	Serial.write('S');
-	Serial.write((unsigned char*)&acState, sizeof(acState));
+	xbSerial.write('S');
+	xbSerial.write((unsigned char*)&acState, sizeof(acState));
 }
 
 void handle_input()
 {
-	Serial.write("Dhandle_input called\n");
-	while (Serial.available()) {
-		char c = Serial.read();
+	digitalWrite(RED_LED, HIGH);
+	while (xbSerial.available()) {
+		char c = xbSerial.read();
 		switch (state) {
 			case STATE_START:
-				if (c == 'S')
-					send_state();
+				if (c == 'S'){
+					send_state();}
 				else if (c == 'C')
 					state = STATE_READ;
 				// Ignore anything else - it's invalid
