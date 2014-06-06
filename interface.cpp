@@ -10,6 +10,11 @@ byte readAt = 0;
 ACstate acState = {};
 ACstate newState = {};
 
+void send_state()
+{
+	// TODO send state to server
+}
+
 void serialEvent()
 {
 	while (Serial.available()) {

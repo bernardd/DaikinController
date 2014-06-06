@@ -4,7 +4,24 @@ Server -> Client:
 
 Client -> Server
 'S[State]' - Current state
+RRR - Reset stream (close and let the XBee reopen it)
 
 
+State:
 
+Comfort:1
+time:11
+day:3
+power:1
+mode:3
+temp:7
+vert_deflect:4
+hoix_deflect:4
+turn_on_time:11
+turn_off_time:11
+powerful:1
+quiet:1
+motion_detect:1
+eco:1
+timer:1
 

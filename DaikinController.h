@@ -6,6 +6,12 @@
 #define IR_LED 9
 #define RED_LED 13
 
+#define PWM_RATE 27 // us interval
+#define PWM_DUTY 379 // ~37% (100% = 1023)
+#define PWM_ON Timer1.pwm(IR_LED, PWM_DUTY, PWM_RATE)
+#define PWM_OFF Timer1.disablePwm(9);
+
+
 // Day of week
 #define DOW_SUN 1
 #define DOW_MON 2
