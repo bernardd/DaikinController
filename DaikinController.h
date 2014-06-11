@@ -3,6 +3,7 @@
 
 #include <Arduino.h>
 
+#define IR_RECEIVER 4
 #define IR_LED 9
 #define RED_LED 13
 
@@ -75,9 +76,9 @@
 
 #define NO_TIME 0x600
 
-typedef struct ACstate {
+typedef struct {
 	byte comfort:1;
-	unsigned int time:11;
+	unsigned short time:11;
 	byte day:3;
 	byte power:1;
 	byte mode:3;
@@ -85,8 +86,8 @@ typedef struct ACstate {
 	byte vert_deflector:4;
 	byte fan:4;
 	byte horiz_deflector:4;
-	unsigned int turn_on_time:11;
-	unsigned int turn_off_time:11;
+	unsigned short turn_on_time:11;
+	unsigned short turn_off_time:11;
 	byte powerful:1;
 	byte quiet:1;
 	byte motion_detect:1;
@@ -94,8 +95,67 @@ typedef struct ACstate {
 	byte timer:1; // 65 bits
 } ACstate;
 
-void send_new_state(ACstate *s);
-void send_state();
+typedef struct Block1 {
+	byte header[6];
+	byte pad1:4; // 0
+	byte comfort:1;
+	byte pad2:3; // 0
+	byte checksum;
+} Block1;
+
+typedef struct Block2 {
+	byte header[5];
+	byte time:11;
+	byte day:3;
+	byte pad:2;
+	byte checksum;
+} Block2;
+
+typedef struct Block3 {
+	byte header[5];
+	byte power:1;
+	byte pad:3;  // 0x6
+	byte mode:3;
+	byte pad2:2; // 0
+	byte temp:7;
+	byte pad3;   // 0
+	byte vert_deflector:4;
+	byte fan:4;
+	byte horiz_deflector:4;
+	byte pad4:4; // 0
+	unsigned int turn_on_time:11;
+	byte pad5:1; // 0
+	unsigned int turn_off_time:11;
+	byte pad6:1; // 0
+	byte powerful:1;
+	byte pad7:4; // 0
+	byte quiet:1;
+	byte pad8:2;
+	byte pad9[2];
+	byte pad10:1; // 0
+	byte motion_detect:1;
+	byte eco:1;
+	byte pad11:4;
+	byte timer:1;
+	byte pad12; // 0
+	byte checksum;
+} Block3;
+
 void handle_input();
+bool receive();
+void blocks_to_state(Block1 *b1, Block2 *b2, Block3 *b3, ACstate *s);
+void update_server_state(ACstate *s);
+void send_state_to_server();
+void send_state_to_ac(ACstate *s);
+
+// Pulse times (microseconds)
+#define PREFIX_PULSE 475
+#define ZERO_PULSE 440
+#define ONE_PULSE 1300
+#define ON_PULSE 440
+#define BLOCK_START_PULSE 3500
+#define BLOCK_START_OFF 1740
+#define START_BLOCK_DELAY 25300 // Adjusted for receiving - was 25000 for sending
+#define INTER_BLOCK_DELAY 34800 // Adjusted for receiving - was 34000
 
 #endif // _DAIKINCONTROLLER_H_

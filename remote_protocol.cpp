@@ -1,62 +1,9 @@
 #include <TimerOne.h>
 #include "DaikinController.h"
 
-// Pulse times (microseconds)
-#define ZERO_PULSE 440
-#define ONE_PULSE 1300
-#define ON_PULSE 440
-#define BLOCK_START_PULSE 3500
-#define BLOCK_START_OFF 1740
-
 const byte b1header[6] = {0x11, 0xDA, 0x27, 0, 0xC5, 0};
 const byte b2header[5] = {0x11, 0xDA, 0x27, 0, 0x42};
 const byte b3header[5] = {0x11, 0xDA, 0x27, 0, 0};
-
-typedef struct Block1 {
-	byte header[6];
-	byte pad1:4; // 0
-	byte comfort:1;
-	byte pad2:3; // 0
-	byte checksum;
-} Block1;
-
-typedef struct Block2 {
-	byte header[5];
-	byte time:11;
-	byte day:3;
-	byte pad:2;
-	byte checksum;
-} Block2;
-
-typedef struct Block3 {
-	byte header[5];
-	byte power:1;
-	byte pad:3;  // 0x6
-	byte mode:3;
-	byte pad2:2; // 0
-	byte temp:7;
-	byte pad3;   // 0
-	byte vert_deflector:4;
-	byte fan:4;
-	byte horiz_deflector:4;
-	byte pad4:4; // 0
-	unsigned int turn_on_time:11;
-	byte pad5:1; // 0
-	unsigned int turn_off_time:11;
-	byte pad6:1; // 0
-	byte powerful:1;
-	byte pad7:4; // 0
-	byte quiet:1;
-	byte pad8:2;
-	byte pad9[2];
-	byte pad10:1; // 0
-	byte motion_detect:1;
-	byte eco:1;
-	byte pad11:4;
-	byte timer:1;
-	byte pad12; // 0
-	byte checksum;
-} Block3;
 
 void on_pulse() {
 	PWM_ON;
@@ -131,6 +78,53 @@ void state_to_blocks(ACstate *s, Block1 *b1, Block2 *b2, Block3 *b3)
 	b3->timer = s->timer;
 }
 
+void blocks_to_state(Block1 *b1, Block2 *b2, Block3 *b3, ACstate *s)
+{
+	s->comfort = b1->comfort;
+	Serial.print("comfort: ");
+	Serial.println(s->comfort);
+	s->time = b2->time;
+	Serial.print("time: ");
+	Serial.println(s->time);
+	s->day = b2->day;
+	Serial.print("day: ");
+	Serial.println(s->day);
+	s->power = b3->power;
+	Serial.print("power: ");
+	Serial.println(s->power);
+	s->mode = b3->mode;
+	Serial.print("mode: ");
+	Serial.println(s->mode);
+	s->temp = b3->temp;
+	Serial.print("temp: ");
+	Serial.println(s->temp);
+	s->vert_deflector = b3->vert_deflector;
+	Serial.print("vert_deflector: ");
+	Serial.println(s->vert_deflector);
+	s->fan = b3->fan;
+	Serial.print("fan: ");
+	Serial.println(s->fan);
+	s->horiz_deflector = b3->horiz_deflector;
+	Serial.print("horiz_deflector: ");
+	Serial.println(s->horiz_deflector);
+	s->powerful = b3->powerful;
+	Serial.print("powerful: ");
+	Serial.println(s->powerful);
+	s->quiet = b3->quiet;
+	Serial.print("quiet: ");
+	Serial.println(s->quiet);
+	s->motion_detect = b3->motion_detect;
+	Serial.print("motion_detect: ");
+	Serial.println(s->motion_detect);
+	s->eco = b3->eco;
+	Serial.print("eco: ");
+	Serial.println(s->eco);
+	s->timer = b3->timer;
+	Serial.print("timer: ");
+	Serial.println(s->timer);
+}
+
+
 void send_block(byte *b, unsigned int s)
 {
 	start_pulse();
@@ -146,6 +140,7 @@ void send_block(byte *b, unsigned int s)
 
 void send_message(Block1 *b1, Block2 *b2, Block3 *b3)
 {
+	Serial.println("Writing out state");
 	calc_checksum((byte*)b1, sizeof(Block1));
 	calc_checksum((byte*)b2, sizeof(Block2));
 	calc_checksum((byte*)b3, sizeof(Block3));
@@ -154,13 +149,13 @@ void send_message(Block1 *b1, Block2 *b2, Block3 *b3)
 	for (int i=0; i<5; i++)
 		send(0);
 	on_pulse();
-	delay(25);
+	delay(START_BLOCK_DELAY / 1000);
 
 	send_block((byte*)b1, sizeof(Block1));
-	delay(34);
+	delay(INTER_BLOCK_DELAY / 1000);
 
 	send_block((byte*)b2, sizeof(Block2));
-	delay(34);
+	delay(INTER_BLOCK_DELAY / 1000);
 
 	send_block((byte*)b3, sizeof(Block3));
 }
@@ -181,7 +176,7 @@ void init_b3(Block3 *b3) {
 	b3->pad = 0x6;
 }
 
-void send_new_state(ACstate *s)
+void send_state_to_ac(ACstate *s)
 {
 	Block1 b1;
 	Block2 b2;
