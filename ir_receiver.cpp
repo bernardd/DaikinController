@@ -20,22 +20,27 @@
 
 bool read_block(void *block, size_t size)
 {
+	Serial.println();
 	EXPECT_PULSE(BLOCK_START_OFF);
 	for (size_t i=0; i<size; i++) {
 		byte b = 0;
 		for (int j=0; j<8; j++) {
 			unsigned long t = PULSE;
-			if (IS_NEAR(t, ONE_PULSE))
+			if (IS_NEAR(t, ONE_PULSE)) {
+				Serial.print(1);
 				b |= 1 << j;
-			else if (!IS_NEAR(t, ZERO_PULSE)) {
+			} else if (!IS_NEAR(t, ZERO_PULSE)) {
 				Serial.print("Expected pulse not received at: ");
 				Serial.print(__LINE__);
 				Serial.print(" Got: ");
 				Serial.println(t);
 				return false;
+			} else {
+				Serial.print(0);
 			}
 		}
 		*((byte *)block+i) = b;
+		Serial.print(" ");
 	}
 	return true;
 }
@@ -59,6 +64,8 @@ bool receive() {
 	EXPECT_PULSE(INTER_BLOCK_DELAY);
 	EXPECT(read_block(&b3, sizeof(b3)));
 	
+	Serial.println();
+
 	//TODO: Verify checksum!
 
 	ACstate s;

@@ -78,7 +78,7 @@
 
 typedef struct {
 	byte comfort:1;
-	unsigned short time:11;
+	unsigned int time:11;
 	byte day:3;
 	byte power:1;
 	byte mode:3;
@@ -86,8 +86,8 @@ typedef struct {
 	byte vert_deflector:4;
 	byte fan:4;
 	byte horiz_deflector:4;
-	unsigned short turn_on_time:11;
-	unsigned short turn_off_time:11;
+	unsigned int turn_on_time:11;
+	unsigned int turn_off_time:11;
 	byte powerful:1;
 	byte quiet:1;
 	byte motion_detect:1;
@@ -105,7 +105,7 @@ typedef struct Block1 {
 
 typedef struct Block2 {
 	byte header[5];
-	byte time:11;
+	unsigned int time:11;
 	byte day:3;
 	byte pad:2;
 	byte checksum;
