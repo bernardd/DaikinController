@@ -61,7 +61,7 @@ server_loop(Socket, DataSoFar) ->
 	inet:setopts(Socket, [{active, once}]),
 	receive
 		{tcp, Socket, Data} ->
-			io:fwrite("Got Data: ~p~n", [Data]),
+%			io:fwrite("Got Data: ~p~n", [Data]),
 			case handle_data(<<DataSoFar/binary, Data/binary>>) of
 				stop ->
 					ok;
