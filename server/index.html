@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Daikin Controller</title>
+	</head>
+	<body>
+		Fan: <select name="fan_select" data-dojo-type="dijit/form/Select">
+			{% for fan in fan_powers %}
+			<option value="{{fan.value}}" {% if fan.selected %}selected="selected"{% endif %}>{{fan.name}}</option>
+			{% endfor %}
+		</select><p>
+
+			<!-- load Dojo -->
+			<script src="http://ajax.googleapis.com/ajax/libs/dojo/1.9.3/dojo/dojo.js"
+				data-dojo-config="async: true"></script>
+
+			<script>
+				require([
+				'dojo/dom',
+				'dojo/dom-construct',
+				'dojo/parser',
+				'dijit/form/Select'
+				], function (dom, domConstruct) {
+					var greetingNode = dom.byId('greeting');
+					domConstruct.place('<i> Dojo!</i>', greetingNode);
+				});
+			</script>
+		</body>
+	</html>

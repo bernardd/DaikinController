@@ -2,26 +2,9 @@
 
 -compile(export_all).
 
--define(DEFAULT_PORT, 9750).
+-include("rc_server.hrl").
 
--record(ac_state, {
-		comfort,
-		time,
-		day,
-		power,
-		mode,
-		temp,
-		vert_deflector,
-		fan,
-		horiz_deflector,
-		turn_on_time,
-		turn_off_time,
-		powerful,
-		quiet,
-		motion_detect,
-		eco,
-		timer
-	}).
+-define(DEFAULT_PORT, 9750).
 
 start() -> start(?DEFAULT_PORT).
 
