@@ -1,30 +1,73 @@
 <!DOCTYPE html>
 <html>
-	<head>
-		<meta charset="utf-8">
-		<title>Daikin Controller</title>
-	</head>
-	<body>
-		Fan: <select name="fan_select" data-dojo-type="dijit/form/Select">
-			{% for fan in fan_powers %}
-			<option value="{{fan.value}}" {% if fan.selected %}selected="selected"{% endif %}>{{fan.name}}</option>
-			{% endfor %}
-		</select><p>
+<head>
+<meta charset="utf-8">
+<title>Daikin Controller</title>
+<link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/dojo/1.9.3/dijit/themes/claro/claro.css">
+<script>dojoConfig = {async: true, parseOnLoad: true}</script>
+<script src="http://ajax.googleapis.com/ajax/libs/dojo/1.9.3/dojo/dojo.js"></script>
+<script>
+require([
+		'dojo/dom',
+		'dojo/dom-construct',
+		'dojo/parser',
+		'dijit/form/Select',
+		'dijit/form/NumberSpinner',
+		'dijit/form/Button',
+		'dijit/form/ToggleButton'
+		])
+</script>
+</head>
+<body class="claro">
+<form>
+	{%include "toggle_button.html" with id="power" checked=power text="POWER"%}<p>
 
-			<!-- load Dojo -->
-			<script src="http://ajax.googleapis.com/ajax/libs/dojo/1.9.3/dojo/dojo.js"
-				data-dojo-config="async: true"></script>
+	Fan: <select name="fan_select" data-dojo-type="dijit/form/Select">
+		{% for fan in fan_powers %}
+		<option value="{{fan.value}}" {% if fan.selected %}selected="selected"{% endif %}>{{fan.name}}</option>
+		{% endfor %}
+	</select><p>
 
-			<script>
-				require([
-				'dojo/dom',
-				'dojo/dom-construct',
-				'dojo/parser',
-				'dijit/form/Select'
-				], function (dom, domConstruct) {
-					var greetingNode = dom.byId('greeting');
-					domConstruct.place('<i> Dojo!</i>', greetingNode);
-				});
-			</script>
-		</body>
-	</html>
+	Mode: <select name="mode_select" data-dojo-type="dijit/form/Select">
+		{% for mode in modes %}
+		<option value="{{mode.value}}" {% if mode.selected %}selected="selected"{% endif %}>{{mode.name}}</option>
+		{% endfor %}
+	</select><p>
+
+	Temperature:<input
+	id="temperature"
+	name="temperature"
+	value="{{temperature.value}}"
+	data-dojo-props="constraints:{min:{{temperature.min}},max:{{temperature.max}}}"
+	style="width:50px"
+	data-dojo-type="dijit/form/NumberSpinner"
+	/><p>
+
+	Deflectors:
+	<input id="vert_deflectors" name="vert_deflectors" data-dojo-type="dijit/form/CheckBox"
+		{% for v in vert_deflectors %}
+		{% if v.key == "DEFLECTOR_ON" and v.selected %}checked="true"{% endif %}
+		{% endfor %}
+		/><label for="vert_deflectors">Vertical</label>
+
+	<input id="horiz_deflectors" name="horiz_deflectors" data-dojo-type="dijit/form/CheckBox"
+		{% for v in horiz_deflectors %}
+		{% if v.key == "DEFLECTOR_ON" and v.selected %}checked="true"{% endif %}
+		{% endfor %}
+		/><label for="horiz_deflectors">Horizontal</label>
+	<p>
+
+	{%include "toggle_button.html" with id="comfort" checked=comfort text="Comfort"%}<p>
+
+	{%include "toggle_button.html" with id="quiet" checked=quiet text="Quiet"%}<p>
+
+	{%include "toggle_button.html" with id="motion_detect" checked=motion_detect text="Motion Detect"%}<p>
+
+	{%include "toggle_button.html" with id="eco" checked=eco text="Eco"%}<p>
+
+	<button data-dojo-type="dijit/form/Button" type="submit">Transmit</button>
+
+</form>
+
+</body>
+</html>

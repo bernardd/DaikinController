@@ -9,7 +9,7 @@
 start() -> start(?DEFAULT_PORT).
 
 start(Port) ->
-	register(?MODULE, spawn(fun() -> init(Port) end)).
+	register(?MODULE, spawn(fun() -> init_handler(Port) end)).
 
 stop() ->
 	exit(whereis(?MODULE), kill).
@@ -17,7 +17,7 @@ stop() ->
 get_state() ->
 	?MODULE ! {get_state, self()},
 	receive
-		{rc_state, S} -> S
+		{Type, S} when Type =:= rc_state orelse Type =:= rc_state_cached -> {Type, S}
 	after 500 ->
 		throw({error, timeout})
 	end.
@@ -25,47 +25,69 @@ get_state() ->
 set_state(State) ->
 	?MODULE ! {set_state, State}.
 
-init(Port) ->
+init_listener(Port) ->
 	{ok, Socket} = gen_tcp:listen(Port, [binary, {active, false}, {reuseaddr, true}, {nodelay, true}]),
 	io:fwrite("Listening on socket.~n", []),
 	listen(Socket).
 
 listen(Socket) ->
 	{ok, NewSocket} = gen_tcp:accept(Socket),
-	server(NewSocket),
+	io:fwrite("Connection accepted.~n", []),
+	gen_tcp:controlling_process(NewSocket, whereis(?MODULE)),
+	?MODULE ! {new_socket, NewSocket},
 	listen(Socket).
 
-server(Socket) ->
+init_handler(Port) ->
+	spawn_link(fun() -> init_listener(Port) end),
 	put(state, #ac_state{}),
-	gen_tcp:send(Socket, <<"S">>),
-	server_loop(Socket, <<>>).
+	server_idle().
 
-server_loop(Socket, DataSoFar) ->
-	inet:setopts(Socket, [{active, once}]),
+server_idle() ->
+	receive
+		{new_socket, Socket} ->
+			gen_tcp:send(Socket, <<"S">>),
+			inet:setopts(Socket, [{active, once}]),
+			server_active(Socket, <<>>);
+		{get_state, ReplyTo} ->
+			ReplyTo ! {rc_state_cached, get(state)},
+			server_idle();
+		{set_state, From, _State} ->
+			From ! {error, no_connection},
+			server_idle();
+		M ->
+			io:fwrite("Unexpected message: ~p~n", [M]),
+			server_idle()
+	end.
+
+server_active(Socket, DataSoFar) ->
 	receive
 		{tcp, Socket, Data} ->
 %			io:fwrite("Got Data: ~p~n", [Data]),
 			case handle_data(<<DataSoFar/binary, Data/binary>>) of
 				stop ->
-					ok;
+					gen_tcp:close(Socket),
+					server_idle();
 				Tail ->
-					server_loop(Socket, Tail)
+					inet:setopts(Socket, [{active, once}]),
+					server_active(Socket, Tail)
 			end;
 		{tcp_closed, Socket} ->
-			io:fwrite("Socket closed.~n", []);
+			io:fwrite("Socket closed.~n", []),
+			server_idle();
 		{tcp_error, Socket, Reason} ->
-			io:fwrite("Socket error: ~p~n", [Reason]);
+			io:fwrite("Socket error: ~p~n", [Reason]),
+			server_idle();
 		{get_state, ReplyTo} ->
 			ReplyTo ! {rc_state, get(state)},
-			server_loop(Socket, DataSoFar);
+			server_active(Socket, DataSoFar);
 		{set_state, State} ->
 			Packet = state_to_packet(State),
 			gen_tcp:send(Socket, Packet),
 			put(state, State),
-			server_loop(Socket, DataSoFar);
+			server_active(Socket, DataSoFar);
 		M ->
 			io:fwrite("Unexpected message: ~p~n", [M]),
-			server_loop(Socket, DataSoFar)
+			server_active(Socket, DataSoFar)
 	end.
 
 state_to_packet(State) ->

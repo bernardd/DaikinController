@@ -20,6 +20,9 @@
 		timer
 	}).
 
+-define(MIN_TEMP, 18).
+-define(MAX_TEMP, 30).
+
 -record(setting, {
 		name :: string(),
 		key :: atom(),

@@ -2,6 +2,8 @@
 
 -compile(export_all). % Lazy
 
+-export([init/3, handle/2, terminate/3]).
+
 -behaviour(cowboy_http_handler).
 
 -include("rc_server.hrl").
@@ -20,18 +22,28 @@ terminate(_Reason, _Req, _State) ->
 	ok.
 
 body() ->
-	State = rc_server:get_state(),
-	{ok, Body} = index_template:render(
-		[
-			{fan_powers, settings_to_proplist(ac_state:fan(), State#ac_state.fan)},
-			{modes, settings_to_proplist(ac_state:modes(), State#ac_state.mode)},
-			{vert_deflectors, settings_to_proplist(ac_state:deflectors(), State#ac_state.vert_deflector)},
-			{horiz_deflectors, settings_to_proplist(ac_state:deflectors(), State#ac_state.horiz_deflector)}
-		]),
+	{Type, State} = rc_server:get_state(),
+	RenderData = 
+	  [
+		{fan_powers, settings_to_proplist(ac_data:fan(), State#ac_state.fan)},
+		{modes, settings_to_proplist(ac_data:modes(), State#ac_state.mode)},
+		{vert_deflectors, settings_to_proplist(ac_data:deflectors(), State#ac_state.vert_deflector)},
+		{horiz_deflectors, settings_to_proplist(ac_data:deflectors(), State#ac_state.horiz_deflector)},
+		{temperature, [{value, State#ac_state.temp}, {min, ?MIN_TEMP}, {max, ?MAX_TEMP}]},
+		{power, State#ac_state.power},
+		{comfort, State#ac_state.comfort},
+		{powerful, State#ac_state.powerful},
+		{quiet, State#ac_state.quiet},
+		{motion_detect, State#ac_state.motion_detect},
+		{eco, State#ac_state.eco},
+		{type, Type}
+	  ],
+	io:fwrite("~p\n", [RenderData]),
+	{ok, Body} = index_template:render(RenderData),
 	iolist_to_binary(Body).
 
 settings_to_proplist(Settings, Value) ->
 	[begin
 				[{name, N}, {key, K}, {value, V} | 
-					case V of Value -> [{selected, true}]; _ -> [] end] 
+					case V of Value -> [{selected, true}]; _ -> [] end]
 		end || #setting{name = N, key = K, value = V} <- Settings].
