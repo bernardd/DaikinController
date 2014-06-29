@@ -91,6 +91,7 @@ server_active(Socket, DataSoFar) ->
 	end.
 
 state_to_packet(State) ->
+	io:fwrite("State to packet: ~p\n", [State]),
 	<<"C",
 		(State#ac_state.comfort),
 		(State#ac_state.time):16/little,

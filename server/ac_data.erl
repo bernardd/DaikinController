@@ -29,10 +29,10 @@ modes() ->
 	].
 
 % Deflectors
-deflectors() ->
+deflector() ->
 	[
 		?S("Off", 'DEFLECTOR_OFF', 0),
-		?S("On", 'DEFLECTOR_ON', 16#F)
+		?S("On", 'DEFLECTOR_ON', ?DEFLECTOR_ON)
 	].
 
 % Fan

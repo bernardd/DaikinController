@@ -23,6 +23,10 @@
 -define(MIN_TEMP, 18).
 -define(MAX_TEMP, 30).
 
+-define(DEFLECTOR_ON, 16#F).
+
+-define(NO_TIME, 16#600).
+
 -record(setting, {
 		name :: string(),
 		key :: atom(),

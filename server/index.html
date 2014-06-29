@@ -14,12 +14,13 @@ require([
 		'dijit/form/Select',
 		'dijit/form/NumberSpinner',
 		'dijit/form/Button',
-		'dijit/form/ToggleButton'
+		'dijit/form/ToggleButton',
+		'dijit/form/TimeTextBox'
 		])
 </script>
 </head>
 <body class="claro">
-<form>
+<form method="post">
 	{%include "toggle_button.html" with id="power" checked=power text="POWER"%}<p>
 
 	Fan: <select name="fan_select" data-dojo-type="dijit/form/Select">
@@ -44,14 +45,14 @@ require([
 	/><p>
 
 	Deflectors:
-	<input id="vert_deflectors" name="vert_deflectors" data-dojo-type="dijit/form/CheckBox"
-		{% for v in vert_deflectors %}
+	<input id="vert_deflector" name="vert_deflector" data-dojo-type="dijit/form/CheckBox"
+		{% for v in vert_deflector %}
 		{% if v.key == "DEFLECTOR_ON" and v.selected %}checked="true"{% endif %}
 		{% endfor %}
 		/><label for="vert_deflectors">Vertical</label>
 
-	<input id="horiz_deflectors" name="horiz_deflectors" data-dojo-type="dijit/form/CheckBox"
-		{% for v in horiz_deflectors %}
+	<input id="horiz_deflector" name="horiz_deflector" data-dojo-type="dijit/form/CheckBox"
+		{% for v in horiz_deflector %}
 		{% if v.key == "DEFLECTOR_ON" and v.selected %}checked="true"{% endif %}
 		{% endfor %}
 		/><label for="horiz_deflectors">Horizontal</label>
@@ -64,6 +65,12 @@ require([
 	{%include "toggle_button.html" with id="motion_detect" checked=motion_detect text="Motion Detect"%}<p>
 
 	{%include "toggle_button.html" with id="eco" checked=eco text="Eco"%}<p>
+
+	{%include "toggle_button.html" with id="timer" checked=timer text="Timer Enabled"%}<p>
+
+	Turn On: {%include "timer_selection.html" with id="turn_on_time" value=turn_on_time%}<p>
+
+	Turn Off: {%include "timer_selection.html" with id="turn_off_time" value=turn_off_time%}<p>
 
 	<button data-dojo-type="dijit/form/Button" type="submit">Transmit</button>
 
