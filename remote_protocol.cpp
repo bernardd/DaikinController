@@ -114,6 +114,7 @@ void send_block(byte *b, unsigned int s)
 
 void send_message(Block1 *b1, Block2 *b2, Block3 *b3)
 {
+	digitalWrite(RED_LED, HIGH);
 	Serial.println("Writing out state");
 	calc_checksum((byte*)b1, sizeof(Block1));
 	calc_checksum((byte*)b2, sizeof(Block2));
@@ -132,6 +133,7 @@ void send_message(Block1 *b1, Block2 *b2, Block3 *b3)
 	delay(INTER_BLOCK_DELAY / 1000);
 
 	send_block((byte*)b3, sizeof(Block3));
+	digitalWrite(RED_LED, LOW);
 }
 
 void init_b1(Block1 *b1) {
