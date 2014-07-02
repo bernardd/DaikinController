@@ -67,7 +67,7 @@ void state_to_blocks(ACstate *s, Block1 *b1, Block2 *b2, Block3 *b3)
 	b2->day = s->day;
 	b3->power = s->power;
 	b3->mode = s->mode;
-	b3->temp = s->temp;
+	b3->temp = s->mode == MODE_DRY ? NO_TEMP : s->temp;
 	b3->vert_deflector = s->vert_deflector;
 	b3->fan = s->fan;
 	b3->horiz_deflector = s->horiz_deflector;
@@ -75,7 +75,10 @@ void state_to_blocks(ACstate *s, Block1 *b1, Block2 *b2, Block3 *b3)
 	b3->quiet = s->quiet;
 	b3->motion_detect = s->motion_detect;
 	b3->eco = s->eco;
-	b3->timer = s->timer;
+	b3->turn_on_time = s->turn_on_time;
+	b3->on_timer = s->turn_on_time == NO_TIME ? 0 : 1;
+	b3->turn_off_time = s->turn_off_time;
+	b3->off_timer = s->turn_off_time == NO_TIME ? 0 : 1;
 }
 
 void blocks_to_state(Block1 *b1, Block2 *b2, Block3 *b3, ACstate *s)
@@ -95,7 +98,6 @@ void blocks_to_state(Block1 *b1, Block2 *b2, Block3 *b3, ACstate *s)
 	s->quiet = b3->quiet;
 	s->motion_detect = b3->motion_detect;
 	s->eco = b3->eco;
-	s->timer = b3->timer;
 }
 
 
@@ -149,7 +151,7 @@ void init_b2(Block2 *b2) {
 void init_b3(Block3 *b3) {
 	memset(b3, 0, sizeof(Block3));
 	memcpy(b3->header, b3header, sizeof(b3->header));
-	b3->pad = 0x6;
+	b3->pad = 1;
 }
 
 void print_state(ACstate *s)

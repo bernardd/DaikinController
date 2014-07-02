@@ -114,7 +114,6 @@ state_to_packet(State) ->
 		(State#ac_state.quiet),
 		(State#ac_state.motion_detect),
 		(State#ac_state.eco),
-		(State#ac_state.timer)
 		>>.
 
 handle_data(D = <<"D", Rest/binary>>) ->
@@ -126,7 +125,7 @@ handle_data(D = <<"D", Rest/binary>>) ->
 	end;
 
 handle_data(<<"S", Time:16/little, TurnOn:16/little, TurnOff:16/little, Comfort, Day, Power, Mode, Temp, VertDef, Fan, HoizDef,
-		Powerful, Quiet, MotionDetect, Eco, Timer, Rest/binary>>) ->
+		Powerful, Quiet, MotionDetect, Eco, Rest/binary>>) ->
 	NewState = #ac_state{
 		comfort = Comfort,
 		time = Time,

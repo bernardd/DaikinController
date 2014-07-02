@@ -44,6 +44,7 @@
 
 // Scheduled time no-op
 #define NO_TIME 0x600
+#define NO_TEMP 0x60
 
 // Day of week
 #define DOW_SUN 1
@@ -92,7 +93,6 @@ typedef struct {
 	byte quiet;
 	byte motion_detect;
 	byte eco;
-	byte timer;
 } ACstate;
 
 typedef struct Block1 {
@@ -114,7 +114,9 @@ typedef struct Block2 {
 typedef struct Block3 {
 	byte header[5];
 	byte power:1;
-	byte pad:3;  // 0x6
+	byte on_timer:1;
+	byte off_timer:1;
+	byte pad:1;  // 1
 	byte mode:3;
 	byte pad2:2; // 0
 	byte temp:7;
@@ -136,7 +138,7 @@ typedef struct Block3 {
 	byte motion_detect:1;
 	byte eco:1;
 	byte pad11:4;
-	byte timer:1;
+	byte unknown:1; // ????????????????????????? It was always zero, now it's always 1...
 	byte pad12; // 0
 	byte checksum;
 } Block3;
