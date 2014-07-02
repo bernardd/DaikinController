@@ -155,37 +155,37 @@ void init_b3(Block3 *b3) {
 void print_state(ACstate *s)
 {
 	Serial.print("comfort: ");
-	Serial.println(comfort);
+	Serial.println(s->comfort);
 	Serial.print("time: ");
-	Serial.println(time);
+	Serial.println(s->time);
 	Serial.print("day: ");
-	Serial.println(day);
+	Serial.println(s->day);
 	Serial.print("power: ");
-	Serial.println(power);
+	Serial.println(s->power);
 	Serial.print("mode: ");
-	Serial.println(mode);
+	Serial.println(s->mode);
 	Serial.print("temp: ");
-	Serial.println(temp);
+	Serial.println(s->temp);
 	Serial.print("vert_deflector: ");
-	Serial.println(vert_deflector);
+	Serial.println(s->vert_deflector);
 	Serial.print("fan: ");
-	Serial.println(fan);
+	Serial.println(s->fan);
 	Serial.print("horiz_deflector: ");
-	Serial.println(horiz_deflector);
+	Serial.println(s->horiz_deflector);
 	Serial.print("turn_on_time: ");
-	Serial.println(turn_on_time);
+	Serial.println(s->turn_on_time);
 	Serial.print("turn_off_time: ");
-	Serial.println(turn_off_time);
+	Serial.println(s->turn_off_time);
 	Serial.print("powerful: ");
-	Serial.println(powerful);
+	Serial.println(s->powerful);
 	Serial.print("quiet: ");
-	Serial.println(quiet);
+	Serial.println(s->quiet);
 	Serial.print("motion_detect: ");
-	Serial.println(motion_detect);
+	Serial.println(s->motion_detect);
 	Serial.print("eco: ");
-	Serial.println(eco);
+	Serial.println(s->eco);
 	Serial.print("timer: ");
-	Serial.println(timer);
+	Serial.println(s->timer);
 }
 
 void send_state_to_ac(ACstate *s)

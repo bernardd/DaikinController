@@ -1,15 +1,16 @@
 #include "DaikinController.h"
 
-#define PULSE_TOLERANCE 200
+#define PULSE_TOLERANCE 300
 #define TIMEOUT (INTER_BLOCK_DELAY + BLOCK_START_PULSE + BLOCK_START_OFF + PULSE_TOLERANCE)
 
 #define PULSE pulseIn(IR_RECEIVER, HIGH, TIMEOUT)
 
 #define EXPECT(F) if (!F) {Serial.print("Bailed at line "); Serial.println(__LINE__); return false;}
-#define IS_NEAR(T, V) (T > (V-PULSE_TOLERANCE) && T < (V+PULSE_TOLERANCE))
-#define EXPECT_PULSE(V) { \
+#define IS_NEAR_TOL(T, V, TOL) (T > (V-TOL) && T < (V+TOL))
+#define IS_NEAR(T, V) IS_NEAR_TOL(T, V, PULSE_TOLERANCE)
+#define EXPECT_PULSE_TOL(V, T) { \
 	unsigned long t = PULSE; \
-	if (!IS_NEAR(t, V)) { \
+	if (!IS_NEAR_TOL(t, V, T)) { \
 		Serial.print("Expected pulse not received at: "); \
 		Serial.println(__LINE__); \
 		Serial.print(" Got: "); \
@@ -17,6 +18,7 @@
 		return false; \
 	} \
 }
+#define EXPECT_PULSE(V) EXPECT_PULSE_TOL(V, PULSE_TOLERANCE)
 
 bool read_block(void *block, size_t size)
 {
@@ -57,11 +59,11 @@ bool receive() {
 	for (int i=0; i<5; i++)
 		EXPECT_PULSE(PREFIX_PULSE);
 
-	EXPECT_PULSE(START_BLOCK_DELAY);
+	EXPECT_PULSE_TOL(START_BLOCK_DELAY, 8000);
 	EXPECT(read_block(&b1, sizeof(b1)));
-	EXPECT_PULSE(INTER_BLOCK_DELAY);
+	EXPECT_PULSE_TOL(INTER_BLOCK_DELAY, 8000);
 	EXPECT(read_block(&b2, sizeof(b2)));
-	EXPECT_PULSE(INTER_BLOCK_DELAY);
+	EXPECT_PULSE_TOL(INTER_BLOCK_DELAY, 8000);
 	EXPECT(read_block(&b3, sizeof(b3)));
 	
 	Serial.println();

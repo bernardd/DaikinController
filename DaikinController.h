@@ -4,7 +4,7 @@
 #include <Arduino.h>
 
 #define IR_RECEIVER 4
-#define IR_LED 10
+#define IR_LED 9
 #define RED_LED 13
 
 #define PWM_RATE 27 // us interval
@@ -77,22 +77,22 @@
 #define NO_TIME 0x600
 
 typedef struct {
-	byte comfort:1;
-	unsigned int time:11;
-	byte day:3;
-	byte power:1;
-	byte mode:3;
-	byte temp:7;
-	byte vert_deflector:4;
-	byte fan:4;
-	byte horiz_deflector:4;
-	unsigned int turn_on_time:11;
-	unsigned int turn_off_time:11;
-	byte powerful:1;
-	byte quiet:1;
-	byte motion_detect:1;
-	byte eco:1;
-	byte timer:1; // 65 bits
+	unsigned int time;
+	unsigned int turn_on_time;
+	unsigned int turn_off_time;
+	byte comfort;
+	byte day;
+	byte power;
+	byte mode;
+	byte temp;
+	byte vert_deflector;
+	byte fan;
+	byte horiz_deflector;
+	byte powerful;
+	byte quiet;
+	byte motion_detect;
+	byte eco;
+	byte timer;
 } ACstate;
 
 typedef struct Block1 {

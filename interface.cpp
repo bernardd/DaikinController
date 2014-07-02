@@ -20,27 +20,8 @@ void update_server_state(ACstate *s)
 
 void send_state_to_server()
 {
-	unsigned short t;
 	xbSerial.write('S');
-	xbSerial.write(acState.comfort);
-	t = acState.time;
-	xbSerial.write((unsigned char*)&t, 2);
-	xbSerial.write(acState.day);
-	xbSerial.write(acState.power);
-	xbSerial.write(acState.mode);
-	xbSerial.write(acState.temp);
-	xbSerial.write(acState.vert_deflector);
-	xbSerial.write(acState.fan);
-	xbSerial.write(acState.horiz_deflector);
-	t = acState.turn_on_time;
-	xbSerial.write((unsigned char*)&t, 2);
-	t = acState.turn_off_time;
-	xbSerial.write((unsigned char*)&t, 2);
-	xbSerial.write(acState.powerful);
-	xbSerial.write(acState.quiet);
-	xbSerial.write(acState.motion_detect);
-	xbSerial.write(acState.eco);
-	xbSerial.write(acState.timer);
+	xbSerial.write((unsigned char*)&acState, sizeof(acState));
 	xbSerial.flush();
 }
 
