@@ -45,9 +45,7 @@ init_handler(Port) ->
 server_idle() ->
 	receive
 		{new_socket, Socket} ->
-			gen_tcp:send(Socket, <<"S">>),
-			inet:setopts(Socket, [{active, once}]),
-			server_active(Socket, <<>>);
+			handle_new_socket(Socket);
 		{get_state, ReplyTo} ->
 			ReplyTo ! {rc_state_cached, get(state)},
 			server_idle();
@@ -85,16 +83,26 @@ server_active(Socket, DataSoFar) ->
 			gen_tcp:send(Socket, Packet),
 			put(state, State),
 			server_active(Socket, DataSoFar);
+		{new_socket, NewSocket} ->
+			gen_tcp:close(Socket),
+			handle_new_socket(NewSocket);
 		M ->
 			io:fwrite("Unexpected message: ~p~n", [M]),
 			server_active(Socket, DataSoFar)
 	end.
 
+handle_new_socket(Socket) ->
+	gen_tcp:send(Socket, <<"S">>),
+	inet:setopts(Socket, [{active, once}]),
+	server_active(Socket, <<>>).
+
 state_to_packet(State) ->
 	io:fwrite("State to packet: ~p\n", [State]),
 	<<"C",
-		(State#ac_state.comfort),
 		(State#ac_state.time):16/little,
+		(State#ac_state.turn_on_time):16/little,
+		(State#ac_state.turn_off_time):16/little,
+		(State#ac_state.comfort),
 		(State#ac_state.day),
 		(State#ac_state.power),
 		(State#ac_state.mode),
@@ -102,8 +110,6 @@ state_to_packet(State) ->
 		(State#ac_state.vert_deflector),
 		(State#ac_state.fan),
 		(State#ac_state.horiz_deflector),
-		(State#ac_state.turn_on_time):16/little,
-		(State#ac_state.turn_off_time):16/little,
 		(State#ac_state.powerful),
 		(State#ac_state.quiet),
 		(State#ac_state.motion_detect),
@@ -119,7 +125,7 @@ handle_data(D = <<"D", Rest/binary>>) ->
 			handle_data(Tail)
 	end;
 
-handle_data(<<"S", Comfort, Time:16/little, Day, Power, Mode, Temp, VertDef, Fan, HoizDef, TurnOn:16/little, TurnOff:16/little,
+handle_data(<<"S", Time:16/little, TurnOn:16/little, TurnOff:16/little, Comfort, Day, Power, Mode, Temp, VertDef, Fan, HoizDef,
 		Powerful, Quiet, MotionDetect, Eco, Timer, Rest/binary>>) ->
 	NewState = #ac_state{
 		comfort = Comfort,
