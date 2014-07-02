@@ -51,14 +51,14 @@
 110001000010110111110010000000000000000001001000001010100000000000000010111110000000000000110000000000110000000000000000010000011010000000000000010111000 On Fan -- A O D Motion sensor
 110001000010110111110010000000000000000001101000001010100000000001111010111110000001001011000000000000110000000000000000010000011000000010000000011010010 On A 21 A D D On@0700
 110001000010110111110010000000000000000001011000001010100000000001111010111110000000000000110001001011000000000000000000010000011000000010000000000010101 On A 21 A D D Off@700
-1                                         ^OnT    ^^^^^??-Temp(deg C)^^^^-Fan                            ^-Powererful              ^-Eco         ^^^^^^^^-Checksum (modular sum excluding first bit)
+1                                         ^OnT    ^^^^^XX-Temp(deg C)^^^^-Fan                            ^-Powererful              ^-Eco         ^^^^^^^^-Checksum (modular sum excluding first bit)
                                          ^-Power                 ^^^^-VD ^^^^-HD ^^^^^^^^^XX-Turn on time     ^ Quiet             ^-Motion Sensor
-                                             ^^^-Mode                                        ^^^^^^^^^XX-Turn off time                  ^-?????
+                                             ^^^-Mode                                        ^^^^^^^^^XX-Turn off time                  ^-Program enabled (0=ON, 1=OFF)
                                            ^OffT
 
 1.10001000.01011011.11100100.00000000.00000000.10110000.01010100.00000000.11110101.11110000.00000000.01100010.01011000.00000000.00000000.10000011.00000001.00000000.00010101 On A 21 A D D Off@700
                                                ^^^ ^^^   ^^^^^^^          ^^^^^^^^ ^^^^     ^^^^^^^^ ^^^ ^^^^ ^^^^^^^  ^    ^                      ^^    ^          ^^^^^^^^
-                                               P10 Mode  Temp             VD  Fan  HD       Turn on time Turn off time Pwfl Quiet                  MEco  ?????      Checksum
+                                               P10 Mode  Temp             VD  Fan  HD       Turn on time Turn off time Pwfl Quiet                  MEco  Program    Checksum
 
 Checksum:
 10001000

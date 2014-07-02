@@ -152,6 +152,7 @@ void init_b3(Block3 *b3) {
 	memset(b3, 0, sizeof(Block3));
 	memcpy(b3->header, b3header, sizeof(b3->header));
 	b3->pad = 1;
+	b3->program = 1; // 1 == OFF. TODO: Support programming ("when I have time...")
 }
 
 void print_state(ACstate *s)

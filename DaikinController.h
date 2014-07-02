@@ -138,7 +138,7 @@ typedef struct Block3 {
 	byte motion_detect:1;
 	byte eco:1;
 	byte pad11:4;
-	byte unknown:1; // ????????????????????????? It was always zero, now it's always 1...
+	byte program:1; // INVERTED: 1 when no program is present, 0 when one is.
 	byte pad12; // 0
 	byte checksum;
 } Block3;
