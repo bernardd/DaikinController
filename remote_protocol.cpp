@@ -152,8 +152,47 @@ void init_b3(Block3 *b3) {
 	b3->pad = 0x6;
 }
 
+void print_state(ACstate *s)
+{
+	Serial.print("comfort: ");
+	Serial.println(comfort);
+	Serial.print("time: ");
+	Serial.println(time);
+	Serial.print("day: ");
+	Serial.println(day);
+	Serial.print("power: ");
+	Serial.println(power);
+	Serial.print("mode: ");
+	Serial.println(mode);
+	Serial.print("temp: ");
+	Serial.println(temp);
+	Serial.print("vert_deflector: ");
+	Serial.println(vert_deflector);
+	Serial.print("fan: ");
+	Serial.println(fan);
+	Serial.print("horiz_deflector: ");
+	Serial.println(horiz_deflector);
+	Serial.print("turn_on_time: ");
+	Serial.println(turn_on_time);
+	Serial.print("turn_off_time: ");
+	Serial.println(turn_off_time);
+	Serial.print("powerful: ");
+	Serial.println(powerful);
+	Serial.print("quiet: ");
+	Serial.println(quiet);
+	Serial.print("motion_detect: ");
+	Serial.println(motion_detect);
+	Serial.print("eco: ");
+	Serial.println(eco);
+	Serial.print("timer: ");
+	Serial.println(timer);
+}
+
 void send_state_to_ac(ACstate *s)
 {
+	Serial.println("Sending state to AC");
+	print_state(s);
+
 	Block1 b1;
 	Block2 b2;
 	Block3 b3;
