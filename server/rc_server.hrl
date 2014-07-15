@@ -2,8 +2,10 @@
 -define(_RC_SERVER_HRL_, 1).
 
 -record(ac_state, {
-		comfort,
 		time,
+		turn_on_time,
+		turn_off_time,
+		comfort,
 		day,
 		power,
 		mode,
@@ -11,13 +13,10 @@
 		vert_deflector,
 		fan,
 		horiz_deflector,
-		turn_on_time,
-		turn_off_time,
 		powerful,
 		quiet,
 		motion_detect,
-		eco,
-		timer
+		eco
 	}).
 
 -define(MIN_TEMP, 18).

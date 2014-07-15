@@ -47,7 +47,7 @@ body() ->
 		{quiet, State#ac_state.quiet},
 		{motion_detect, State#ac_state.motion_detect},
 		{eco, State#ac_state.eco},
-		{turn_on_time, {value, "T16:00:00"}, %rc_server:p_time(State#ac_state.turn_on_time)},
+		{turn_on_time, {value, "T16:00:00"}}, %rc_server:p_time(State#ac_state.turn_on_time)},
 		{turn_off_time, "T16:00:00"}, %rc_server:p_time(State#ac_state.turn_on_time)},
 		{type, Type}
 	  ],
@@ -74,7 +74,6 @@ update_state(List) ->
 		eco=0,
 		turn_on_time=?NO_TIME,
 		turn_off_time=?NO_TIME,
-		timer=0,
 		time=Time,
 		day=Day
 	},

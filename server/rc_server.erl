@@ -113,7 +113,7 @@ state_to_packet(State) ->
 		(State#ac_state.powerful),
 		(State#ac_state.quiet),
 		(State#ac_state.motion_detect),
-		(State#ac_state.eco),
+		(State#ac_state.eco)
 		>>.
 
 handle_data(D = <<"D", Rest/binary>>) ->
@@ -141,8 +141,7 @@ handle_data(<<"S", Time:16/little, TurnOn:16/little, TurnOff:16/little, Comfort,
 		powerful = Powerful,
 		quiet = Quiet,
 		motion_detect = MotionDetect,
-		eco = Eco,
-		timer = Timer
+		eco = Eco
 	},
 	io:fwrite("Got new state: ~s~n", [format_state(NewState)]),
 	put(state, NewState),
@@ -221,5 +220,4 @@ format_state(State) ->
 	"Powerful: " ++ p_toggle(State#ac_state.powerful) ++ "\n" ++
 	"Quiet: " ++ p_toggle(State#ac_state.quiet) ++ "\n" ++
 	"Motion_detect: " ++ p_toggle(State#ac_state.motion_detect) ++ "\n" ++
-	"Eco: " ++ p_toggle(State#ac_state.eco) ++ "\n" ++
-	"Timer: " ++ p_toggle(State#ac_state.timer) ++ "\n".
+	"Eco: " ++ p_toggle(State#ac_state.eco) ++ "\n".
