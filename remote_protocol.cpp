@@ -187,8 +187,6 @@ void print_state(ACstate *s)
 	Serial.println(s->motion_detect);
 	Serial.print("eco: ");
 	Serial.println(s->eco);
-	Serial.print("timer: ");
-	Serial.println(s->timer);
 }
 
 void send_state_to_ac(ACstate *s)

@@ -153,10 +153,10 @@ void send_state_to_ac(ACstate *s);
 // Pulse times (microseconds)
 #define PREFIX_PULSE 475
 #define ZERO_PULSE 440
-#define ONE_PULSE 1300
+#define ONE_PULSE 1500
 #define ON_PULSE 440
 #define BLOCK_START_PULSE 3500
-#define BLOCK_START_OFF 1740
+#define BLOCK_START_OFF 2000
 #define START_BLOCK_DELAY 25300 // Adjusted for receiving - was 25000 for sending
 #define INTER_BLOCK_DELAY 34800 // Adjusted for receiving - was 34000
 
