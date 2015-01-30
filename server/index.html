@@ -3,78 +3,56 @@
 <head>
 <meta charset="utf-8">
 <title>Daikin Controller</title>
-<link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/dojo/1.9.3/dijit/themes/claro/claro.css">
-<script>dojoConfig = {async: true, parseOnLoad: true}</script>
-<script src="http://ajax.googleapis.com/ajax/libs/dojo/1.9.3/dojo/dojo.js"></script>
-<script>
-require([
-		'dojo/dom',
-		'dojo/dom-construct',
-		'dojo/parser',
-		'dijit/form/Select',
-		'dijit/form/NumberSpinner',
-		'dijit/form/Button',
-		'dijit/form/ToggleButton',
-		'dijit/form/TimeTextBox'
-		])
-</script>
+<link rel="stylesheet" href="static/bootstrap.min.css">
+<link rel="stylesheet" href="static/freon.css">
+<script src="static/bootstrap.min.js"></script>
+<script src="static/jquery-2.1.3.min.js"></script>
+<script src="static/socket.io-1.3.2.js"></script>
+<script src="static/freon.js"></script>
 </head>
-<body class="claro">
+<body>
 <form method="post">
-	{%include "toggle_button.html" with id="power" checked=power text="POWER"%}<p>
+	<div class="row"><div class="col-md-4"></div><div class="col-md-4">
+	<button id="power" class="toggle">POWER</button><p>
 
-	Fan: <select name="fan_select" data-dojo-type="dijit/form/Select">
+	Fan
+	<select name="fan_select" class="form-control">
 		{% for fan in fan_powers %}
-		<option value="{{fan.value}}" {% if fan.selected %}selected="selected"{% endif %}>{{fan.name}}</option>
+			<option value="{{fan.value}}" {% if fan.selected %}selected="selected"{% endif %}>{{fan.name}}</option>
 		{% endfor %}
 	</select><p>
 
-	Mode: <select name="mode_select" data-dojo-type="dijit/form/Select">
+	Mode <select name="mode_select" class="form-control">
 		{% for mode in modes %}
 		<option value="{{mode.value}}" {% if mode.selected %}selected="selected"{% endif %}>{{mode.name}}</option>
 		{% endfor %}
 	</select><p>
 
-	Temperature:<input
-	id="temperature"
-	name="temperature"
-	value="{{temperature.value}}"
-	data-dojo-props="constraints:{min:{{temperature.min}},max:{{temperature.max}}}"
-	style="width:50px"
-	data-dojo-type="dijit/form/NumberSpinner"
-	/><p>
+	Temperature<input name="temperature" class="form-control" type="text"/><p>
 
-	Deflectors:
-	<input id="vert_deflector" name="vert_deflector" data-dojo-type="dijit/form/CheckBox"
-		{% for v in vert_deflector %}
-		{% if v.key == "DEFLECTOR_ON" and v.selected %}checked="true"{% endif %}
-		{% endfor %}
-		/><label for="vert_deflectors">Vertical</label>
+	Deflectors
+	<button id="vert_deflector" class="btn btn-danger">Vertical</button>
+	<button id="horiz_deflector" class="btn btn-danger">Horizontal</button><p>
 
-	<input id="horiz_deflector" name="horiz_deflector" data-dojo-type="dijit/form/CheckBox"
-		{% for v in horiz_deflector %}
-		{% if v.key == "DEFLECTOR_ON" and v.selected %}checked="true"{% endif %}
-		{% endfor %}
-		/><label for="horiz_deflectors">Horizontal</label>
-	<p>
+	<button id="comfort" class="toggle">Comfort</button><p>
 
-	{%include "toggle_button.html" with id="comfort" checked=comfort text="Comfort"%}<p>
+	<button id="quiet" class="toggle">Quiet</button><p>
 
-	{%include "toggle_button.html" with id="quiet" checked=quiet text="Quiet"%}<p>
+	<button id="motion_detect" class="toggle">Motion Detect</button><p>
 
-	{%include "toggle_button.html" with id="motion_detect" checked=motion_detect text="Motion Detect"%}<p>
+	<button id="eco" class="toggle">Eco</button><p>
 
-	{%include "toggle_button.html" with id="eco" checked=eco text="Eco"%}<p>
+	<button id="timer" class="toggle">Timer</button><p>
 
-	{%include "toggle_button.html" with id="timer" checked=timer text="Timer Enabled"%}<p>
+	Turn On: <input id="turn_on_enable" name="turn_on_enable" /><p>
 
-	Turn On: {%include "timer_selection.html" with id="turn_on_time" value=turn_on_time%}<p>
+	Turn Off: <input id="turn_off_enable" name="turn_off_enable" /><p>
 
-	Turn Off: {%include "timer_selection.html" with id="turn_off_time" value=turn_off_time%}<p>
+	<button id="submit" type="submit" class="btn btn-primary btn-block">Transmit</button>
 
-	<button data-dojo-type="dijit/form/Button" type="submit">Transmit</button>
-
+</div></div>
 </form>
 
 </body>
 </html>
+
