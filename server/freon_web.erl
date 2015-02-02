@@ -1,4 +1,4 @@
--module(ac_web_handler).
+-module(freon_web).
 
 -compile(export_all). % Lazy
 
@@ -36,10 +36,10 @@ body() ->
 	{Type, State} = rc_server:get_state(),
 	RenderData =
 	  [
-		{fan_powers, settings_to_proplist(ac_data:fan(), State#ac_state.fan)},
-		{modes, settings_to_proplist(ac_data:modes(), State#ac_state.mode)},
-		{vert_deflector, settings_to_proplist(ac_data:deflector(), State#ac_state.vert_deflector)},
-		{horiz_deflector, settings_to_proplist(ac_data:deflector(), State#ac_state.horiz_deflector)},
+		{fan_powers, settings_to_proplist(ac_data:fan())},
+		{modes, settings_to_proplist(ac_data:modes())},
+		{vert_deflector, settings_to_proplist(ac_data:deflector())},
+		{horiz_deflector, settings_to_proplist(ac_data:deflector())},
 		{temperature, [{value, State#ac_state.temp}, {min, ?MIN_TEMP}, {max, ?MAX_TEMP}]},
 		{power, State#ac_state.power},
 		{comfort, State#ac_state.comfort},
@@ -54,11 +54,8 @@ body() ->
 	{ok, Body} = index_template:render(RenderData),
 	iolist_to_binary(Body).
 
-settings_to_proplist(Settings, Value) ->
-	[begin
-				[{name, N}, {key, K}, {value, V} | 
-					case V of Value -> [{selected, true}]; _ -> [] end]
-		end || #setting{name = N, key = K, value = V} <- Settings].
+settings_to_proplist(Settings) ->
+	[ [{name, N}, {key, K}, {value, V}] || #setting{name = N, key = K, value = V} <- Settings ].
 
 update_state(List) ->
 	io:fwrite("Got request: ~p\n", [List]),
